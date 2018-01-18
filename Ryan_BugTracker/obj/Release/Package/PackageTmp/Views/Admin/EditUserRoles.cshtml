@@ -1,0 +1,26 @@
+﻿@model Ryan_BugTracker.Models.AdminUserViewModels
+
+@{
+    ViewBag.Title = "EditUserRoles";
+}
+<h2>Edit User Roles</h2>
+
+<hr />
+
+@using (Html.BeginForm("EditUserRoles", "Admin", FormMethod.Post))
+{
+    @Html.DisplayFor(model => model.Name)
+    @Html.HiddenFor((model => model.Id), new { })
+    <hr />
+
+    @Html.ListBox("SelectedRoles", Model.Roles, new { @id = "my-select" })
+    <br />
+    <div class="form-group">
+        <div style="">
+            <input type="submit" value="Assign Roles" class="btn btn-default" />
+        </div>
+    </div>
+    <div>
+        @Html.ActionLink("Back to List", "UserList")
+    </div>
+}

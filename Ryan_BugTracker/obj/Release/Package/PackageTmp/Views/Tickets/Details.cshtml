@@ -1,0 +1,423 @@
+﻿@model Ryan_BugTracker.Models.Ticket
+@using Microsoft.AspNet.Identity;
+
+@{
+    ViewBag.Title = "Details";
+}
+<link href="~/Content/jQuery.FileUpload/css/jquery.fileupload.css" rel="stylesheet" />
+<link href="~/Content/jQuery.FileUpload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+
+<ul class="nav nav-tabs nav-tabs-custom-colored tabs-iconized">
+    <li class="active"><a href="#profile-tab" data-toggle="tab"><i class="fa fa-search"></i> Details</a></li>
+    @{
+        var hau = false;
+        var hcu = Model.AuthorUserId.Equals(User.Identity.GetUserId());
+        if (Model.AssignedToUserId != null) { hau = Model.AssignedToUserId.Equals(User.Identity.GetUserId()); }
+
+        if (User.IsInRole("Administrator") || User.IsInRole("Project Manager") || (User.IsInRole("Submitter") && hcu) || (User.IsInRole("Developer") && (hau || hcu)))
+        {
+            <li><a href="#activity-tab" data-toggle="tab"><i class="fa fa-folder-open"></i> History</a></li>
+        }
+
+        else
+        {
+            <li><a id="dud-tab" class="inactive" href="#" @*data-toggle="tab"*@><i class="fa fa-folder-open"></i> History</a></li>
+        }
+
+    }
+</ul>
+<!-- END NAV TABS -->
+<div class="tab-content profile-page">
+    <!-- PROFILE TAB CONTENT -->
+    <div class="tab-pane profile active" id="profile-tab">
+
+        <div class="widget">
+            <div class="widget-header">
+                <h3>Ticket Details</h3>
+            </div>
+            <div class="widget-content">
+                <div>
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Created)<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Model.Created.ToString("d")
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Updated)<br /><br />
+                        </dt>
+
+                        <dd>
+                            @if (Model.Updated.HasValue)
+                            {
+                                @Model.Updated.Value.ToString("d")
+                            }
+                        </dd>
+
+                        <dt>
+                            Ticket Name<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Title)
+                        </dd>
+
+                        <dt>
+                            Description<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Body)
+                        </dd>
+
+                        <dt>
+                            Author<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.AuthorUser.DisplayName)
+                        </dd>
+
+                        <dt>
+                            Project<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Project.Title)
+                        </dd>
+
+                        <dt>
+                            Type<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.TicketType.Name)
+                        </dd>
+
+                        <dt>
+                            Priority<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.TicketPriority.Name)
+                        </dd>
+
+                        <dt>
+                            Assignment<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.AssignedToUser.DisplayName)
+                        </dd>
+
+                        <dt>
+                            Status<br /><br />
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.TicketStatus.Name)
+                        </dd>
+
+                        <dt>
+                            Attachment(s)<br /><br />
+                        </dt>
+
+                        <dd>
+                            @foreach (var attachment in Model.TicketAttachments.Reverse())
+                            {
+                                var fileDl = "/TicketAttachments/" + attachment.TicketId + "/" + attachment.FileUrl;
+                                <img src="/assets/img/Document.png" /><a href="@fileDl">@attachment.FileUrl</a> if (User.IsInRole("Administrator")){ <a href="@Url.Action("DeleteAttachment", new { id = attachment.Id, ticketid = Model.Id })"><img style="width: 10px; margin-left: 10px" src="/assets/ico/delete1.ico" /></a> }<p style="font-size: 10px; margin-bottom: 20px; margin-left: 35px"><em>by <span style="color: #428BCA">@attachment.AuthorUser.DisplayName</span> on @attachment.Created.ToString("d")</em></p>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                @{
+                    var aau = false;
+                    var acu = Model.AuthorUserId.Equals(User.Identity.GetUserId());
+                    if (Model.AssignedToUserId != null) { aau = Model.AssignedToUserId.Equals(User.Identity.GetUserId()); }
+
+                    if (User.IsInRole("Administrator") || User.IsInRole("Project Manager") || (User.IsInRole("Submitter") && acu) || (User.IsInRole("Developer") && (aau || acu)))
+                    {
+                <!--Create Attachments-->
+                        using (Html.BeginForm("CreateAttachment", "Tickets", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="col-md-offset-2">
+                                <div class="form-group">
+                                    <input type="hidden" name="TicketId" value="@Model.Id" />
+                                    <input type="file" name="files" id="files" multiple required/>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="">Attach</button>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <div class="widget-footer">
+                @{
+                    var cau = false;
+                    var ccu = Model.AuthorUserId.Equals(User.Identity.GetUserId());
+                    if (Model.AssignedToUserId != null) { cau = Model.AssignedToUserId.Equals(User.Identity.GetUserId()); }
+
+                    if (User.IsInRole("Administrator") || User.IsInRole("Project Manager") || (User.IsInRole("Submitter") && ccu) || (User.IsInRole("Developer") && (cau || ccu)))
+                    {
+            <!-- Create Comments -->
+                        using (Html.BeginForm("CreateComment", "Tickets", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div style="padding: 20px">
+                                <h4 style="">Leave a Comment:</h4>
+                                <form role="form" action="">
+                                    <div class="form-group">
+                                        <input type="hidden" name="TicketId" value="@Model.Id" />
+                                        <textarea class="form-control" required data-validation-required-message="This field can't be left blank" name="Body" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" style="">Submit</button>
+                                </form>
+                            </div>
+                            <hr />
+                        }
+                    }
+                }
+                <p style="text-align: center">@Html.ActionLink("Back to List", "Index", "Home")</p>
+            </div>
+        </div>
+
+        <!-- WIDGET SCROLLING -->
+
+        @if (Model.TicketComments.Count() != 0)
+        {
+            <div style="max-height: 500px">
+                <div class="widget widget-scrolling">
+                    <div class="widget-header">
+                        <h3>Comments</h3>
+                        <div class="widget-header-toolbar">
+                            <div class="label" style="font-size: 12px; color: black; background-color: none">Total (@Model.TicketComments.Count())</div>
+                        </div>
+                    </div>
+                    <div class="widget-content" style="padding-left: 20px">
+                        @foreach (var comment in Model.TicketComments)
+                        {
+                            <div class="media">
+                                <a class="pull-left" href="#">
+                                    <img class="media-object" src="@comment.AuthorUser.ProfilePic" style="height: 40px; width: 40px; background-color: white; margin-right: 15px" alt="" />
+                                </a>
+                                <div class="media-body">
+                                    <h4 class="media-heading">
+                                        <strong>@comment.AuthorUser.DisplayName</strong>
+                                        <small>@comment.Created.ToString("g")</small>
+                                    </h4>
+                                    @Html.Raw(comment.Body)
+
+                                    @if (User.IsInRole("Administrator"))
+                                    {
+                                        <p style="margin-top: 15px; font-size: 12px; font-weight: 400">@Html.ActionLink("Edit", "EditComment", new { id = comment.Id, ticketid = Model.Id }) | @Html.ActionLink("Delete", "DeleteComment", new { id = comment.Id, ticketid = Model.Id }) </p>
+                                    }
+                                </div>
+                            </div>
+                            <hr />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+        <!-- END WIDGET SCROLLING -->
+    <div class="tab-pane activity" id="activity-tab">
+        <div class="user-info-left">
+            <div class="col-md-3">
+                <i class="fa fa-caret-right animated pulse infinite col-md-offset-2" style="width: 20%; z-index: 1; font-size: 16px; margin-top: 70px; position: fixed; color: #ff6666"></i>
+            </div>
+        </div>
+        <div class="user-info-right">            
+            <div class="col-md-9" style="padding-left: 30px; padding-bottom: 220px; border-left: 2px solid #ff6666">
+                <a href="javascript:;" id="scrollToBottom"><i class="fa fa-chevron-circle-down" style="font-size: 20px; color: #ff6666"></i></a>
+                <hr class="animated fadeInLeftBig">
+                @foreach (var item in Model.TicketHistories)
+                {
+                    if (item.Property == "Ticket Created")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <!--OldValue = ticket.Title (cheese from controller)-->
+                                <p>Name: @item.OldValue</p>
+                                <p>Description: <em>"@item.NewValue"</em></p>
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>               
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "Ticket Updated (Name)" || item.Property == "Ticket Updated (Description)" || item.Property == "Ticket Updated (Project)" || item.Property == "Ticket Updated (Type)" || item.Property == "Ticket Updated (Priority)" || item.Property == "Ticket Updated (Status)")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>The ticket @item.Dialogue was changed from <em>"@item.OldValue"</em> to <em>"@item.NewValue"</em>.</p>                      
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "New Assignment" )
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p><strong>@item.NewValue</strong> is now the @item.Dialogue.</p>
+                                @if (item.OldValue != null)
+                                {
+                                <p>Previously assigned to: <strong>@item.OldValue</strong></p>
+                                }
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "New Comment")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>A @item.Dialogue was added to the ticket: </p>
+                                <p><em>"@item.NewValue"</em>.</p>                               
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "Comment Edited")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>A @item.Dialogue from <em>"@item.OldValue"</em> to <em>"@item.NewValue"</em>.</p>
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "New Attachment")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>A @item.Dialogue was added to the ticket:</p>
+                                <p>@item.NewValue</p>
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "Attachment Deleted")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>@item.Dialogue from the ticket:</p>
+                                <p>@item.OldValue</p>
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                    if (item.Property == "Comment Deleted")
+                    {
+                        <div class="widget animated fadeInRight grow" style="box-shadow: 8px 8px 5px #888888">
+                            <div class="widget-header" style="background-color: white">
+                                <h3>@item.Property</h3>
+                                <div class="widget-header-toolbar">
+                                    <em style="font-size: 10px; color: black">@item.Changed.ToString("g")</em>
+                                </div>
+                            </div>
+                            <div class="widget-content" style="background-color: #cceeff; font-size: 12px">
+                                <p>@item.Dialogue from the ticket:</p>
+                                <p><em>"@item.OldValue"</em></p>
+                            </div>
+                            <div class="widget-footer" style="background-color:white; color: #ff6666">
+                                @item.User.DisplayName
+                            </div>
+                        </div>
+                        <hr class="animated fadeInLeftBig">
+                    }
+                }
+                <a href="javascript:;" id="scrollToTop"><i class="fa fa-chevron-circle-up" style="font-size: 20px; color: #ff6666"></i></a>
+            </div>
+        </div>
+    </div>  
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+        /*============================================
+	    ScrollTo Links
+	    ==============================================*/
+
+        $(function () {
+            $('#scrollToBottom').bind("click", function () {
+                $('html, body').animate({ scrollTop: $(document).height() });
+                return false;
+            });
+            $('#scrollToTop').bind("click", function () {
+                $('html, body').animate({ scrollTop: 0 });
+                return false;
+            });
+        });
+
+    </script>
+}

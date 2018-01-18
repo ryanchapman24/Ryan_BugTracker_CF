@@ -1,0 +1,35 @@
+﻿@model Ryan_BugTracker.Models.TicketComment
+@{
+    ViewBag.Title = "EditComment";
+}
+
+<h2>Edit Comment</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Comment</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            <div class="control-label col-md-2">
+                <strong>Body</strong>
+            </div>
+            <div class="col-md-10">
+                <textarea id="Body" class="form-control" name="Body" required data-validation-required-message="This field can't be left blank" rows="3">@Model.Body</textarea>                
+                @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Details", new { id = Model.Ticket.Id }, new { @class = "btn btn-default"})
+            </div>
+        </div>
+    </div>
+}

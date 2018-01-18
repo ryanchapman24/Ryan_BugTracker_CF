@@ -1,0 +1,66 @@
+﻿@model Ryan_BugTracker.Models.Project
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete Project</h2>
+<hr />
+@Html.DisplayFor(model => model.Title)
+<hr />
+
+<div>
+    <h3>Are you sure you want to delete this?</h3><br />
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Created)<br /><br />
+        </dt>
+
+        <dd>
+            @Model.Created.ToString("d")
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Updated)<br /><br />
+        </dt>
+
+        <dd>
+        @if (Model.Updated.HasValue)
+        {
+            @Model.Updated.Value.ToString("d")
+        }
+        </dd>
+
+        <dt>
+            Name<br /><br />
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            Description<br /><br />
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Body)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Delete" class="btn btn-default" />
+            </div>
+        </div>
+
+        <div>
+            @Html.ActionLink("Back to List", "ProjectList")
+        </div>
+    }
+</div>

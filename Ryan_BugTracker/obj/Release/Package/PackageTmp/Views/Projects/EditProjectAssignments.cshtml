@@ -1,0 +1,26 @@
+﻿@model Ryan_BugTracker.Models.ProjectUserViewModels
+
+@{
+    ViewBag.Title = "EditProjectAssignments";
+}
+<h2>Edit Project Assignments</h2>
+
+<hr />
+
+@using (Html.BeginForm("EditProjectAssignments", "Projects", FormMethod.Post))
+{
+    @Html.DisplayFor(model => model.Project.Title)
+    @Html.HiddenFor((model => model.Project.Id), new { })
+    <hr />
+
+    @Html.ListBox("SelectedUsers", Model.Users, new { @class = "searchable" })
+    <br />
+    <div class="form-group">
+        <div style="margin-top: 20px">
+            <input type="submit" value="Assign Users" class="btn btn-default" />
+        </div>
+    </div>
+    <div>
+        @Html.ActionLink("Back to List", "ProjectList")
+    </div>
+}

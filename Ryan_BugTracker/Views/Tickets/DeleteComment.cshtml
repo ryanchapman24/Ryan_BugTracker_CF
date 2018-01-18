@@ -1,0 +1,50 @@
+﻿@model Ryan_BugTracker.Models.TicketComment
+@{
+    ViewBag.Title = "DeleteComment";
+}
+
+<h2>Delete Comment</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <h3>Are you sure you want to delete this?</h3>
+    <div>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                Author<br /><br />
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AuthorUser.DisplayName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Created)<br /><br />
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Created)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Body)<br /><br />
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Body)
+            </dd>
+
+        </dl>
+
+
+        <div class="form-group" style="padding-bottom: 30px">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Delete" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Details", new { id = Model.Ticket.Id }, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}

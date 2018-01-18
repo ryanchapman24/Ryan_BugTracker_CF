@@ -1,0 +1,59 @@
+/*	
+*	################################################################################
+*	
+*	My Custom Style for KINGADMIN
+*	---------------------------------------------------------------------
+*
+*	Version		1.0
+*	Author		Your Name
+*	
+*	Override theme style or create your new styles. Direct change to main.css
+*	is not recommended to avoid problems when theme updates arrived in the future
+*	
+*	################################################################################
+*/
+
+.grow { 
+    width:50%;
+    margin-left: 5px;
+    box-shadow: 8px 8px 5px #888888;
+}
+.grow:hover { 
+    width:53%;  
+    margin-left: -5px;
+    margin-top: -5px;
+}
+
+.grow .widget-content {
+
+}
+
+.grow:hover .widget-content {
+    padding-bottom: 30px;
+}
+
+#dud-tab:hover {
+    color: #868686;
+    background-color: #ececec;
+}
+
+
+#fileDisplay img {
+    max-width: 180px;
+    margin-top: 15px;
+    border: 3px solid #fff
+}
+
+.line-hover:hover {
+    background-color: #fafafa;
+}
+
+.sneaky {
+    visibility: hidden;
+    margin-left: -10px;
+}
+
+.line-hover:hover .sneaky {
+    visibility: visible;
+    margin-left: 0px;
+}

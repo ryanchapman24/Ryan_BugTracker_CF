@@ -1,0 +1,52 @@
+﻿@model Ryan_BugTracker.Models.Project
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Project Details</h2>
+<hr />
+@Html.DisplayFor(model => model.Title)
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Created)<br /><br />
+        </dt>
+
+        <dd>
+            @Model.Created.ToString("d")
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Updated)<br /><br />
+        </dt>
+
+        <dd>
+        @if (Model.Updated.HasValue)
+        {
+            @Model.Updated.Value.ToString("d")
+        }
+        </dd>
+
+        <dt>
+            Name<br /><br />
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            Description<br /><br />
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Body)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "ProjectList")
+</p>

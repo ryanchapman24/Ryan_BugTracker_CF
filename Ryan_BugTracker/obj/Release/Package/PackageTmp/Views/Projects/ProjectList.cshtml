@@ -1,0 +1,88 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "ProjectList";
+    string username = User.Identity.GetUserName();
+}
+
+@model IEnumerable<Ryan_BugTracker.Models.Project>
+
+<div class="widget widget-table">
+    <div class="widget-header">
+        <h3>
+            <i class="fa fa-briefcase"></i> Projects
+            @if (User.IsInRole("Administrator") || User.IsInRole("Project Manager"))
+            {
+            <span style="padding-left: 20px; font-size: 16px">|</span>
+            <span style="font-size: 12px; padding-left: 20px">@Html.ActionLink("Create New Project", "Create", "Projects", null, htmlAttributes: new { style = "font-size: 12px; text-decoration: none" })</span>
+            }
+        </h3>
+        <div class="btn-group widget-header-toolbar">
+            <a href="#" title="Focus" class="btn-borderless btn-focus"><i class="fa fa-eye"></i></a>
+            <a href="#" title="Expand/Collapse" class="btn-borderless btn-toggle-expand"><i class="fa fa-chevron-up"></i></a>
+        </div>
+    </div>
+    <div class="widget-content">      
+        <table id="datatable-data-export" class="table table-sorting table-striped table-hover table-bordered datatable">
+            <thead>
+                <tr>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Name</th>                   
+                    <th>Assigned Users</th>
+                    <th># Tickets</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var item in Model)
+                    {
+                        <tr style="font-size: 10px">
+                            <td>
+                                @item.Created.ToString("yyyy - MM - dd")
+                                <p style="font-size: 10px">by <span style="color: #428BCA"><em>@item.AuthorUserId</em></span></p>
+                            </td>
+                            <td>
+                                @if (item.Updated.HasValue)
+                                {
+                                    @item.Updated.Value.ToString("yyyy - MM - dd")
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>                          
+                            <td>
+                                @foreach (var user in item.Users)
+                                {
+                                    <p>@user.DisplayName</p>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Tickets.Count)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Create Ticket", "Create", "Tickets", new { id = item.Id }, null) <br />
+
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <br />
+                                }
+
+                                @Html.ActionLink("Details", "Details", new { id = item.Id }) <br />
+
+                                @if (User.IsInRole("Administrator") || User.IsInRole("Project Manager"))
+                                {
+                                    @Html.ActionLink("Assign", "EditProjectAssignments", new { id = item.Id }) <br />
+                                }
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }) <br />
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
